@@ -1,8 +1,9 @@
 import { useState } from "react";
 import {nanoid} from "nanoid";
+import CartItem from "./CartItem.jsx";
 
 export default function CartList(){
-  console.log('CartList component rendereed');
+  console.log('CartList component rendered');
   const [items,setItems] = useState([
     {id:nanoid(),name:'Hat',quantity:2},
     {id:nanoid(),name:'Tie',quantity:2},
@@ -25,17 +26,26 @@ function onNameChange(evt, item){
 }
 
 function onAddQuantity(item){
+  const newQuantity = item.quantity + 1;
+  if(newQuantity <= 10){
   const newItems = [...items];
   const index = items.indexOf(item);
   newItems[index].quantity++;
   setItems(newItems);
+  }
 }
 
 function onSubtractQuantity(item){
+  const newQuantity = item.quantity - 1;
+  if(newQuantity > 0){
   const newItems = [...items];
   const index = items.indexOf(item);
   newItems[index].quantity--;
   setItems(newItems);
+  }else{
+    //remove the item from the array
+    setItems(items.filter(i => i.id !== item.id));
+  }
 }
 
   return(
@@ -46,19 +56,11 @@ function onSubtractQuantity(item){
       <br />
       <button type="button" className ="btn btn-primary mb-4" onClick={() => setItems([...items, {id:nanoid(), name:'', quantity:1}])}>Add Item</button>
       {items.map(item => 
-      <div className="row" key={item.id}>
-        <div className="col-4">
-      <input type='text' className="form-control" value={item.name} onChange={(evt) =>onNameChange(evt,item)} />
-      </div>
-      <div className="col-1">
-        <span>{item.quantity}</span>
-        </div>
-      <div className="col-4">
-        <button className="btn btn-danger rounded-circle me-3" onClick={() => onSubtractQuantity(item)}>-</button>
-        <button className="btn btn-success rounded-circle" onClick={() => onAddQuantity(item)}>+</button>
-        </div>
-    </div>
-    )}
+        <CartItem item={item} key={item.id} 
+        onNameChange={(evt) => onNameChange(evt,item)}
+        onAddQuantity={() => onAddQuantity(item)}
+        onSubtractQuantity={() => onSubtractQuantity(item)} />
+        )}
     </div>
     </>
   )
